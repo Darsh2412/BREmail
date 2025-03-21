@@ -12,7 +12,7 @@ export const emails = pgTable("emails", {
   message: text("message").notNull(),
   attachmentInfo: jsonb("attachment_info"),
   sentAt: timestamp("sent_at").defaultNow().notNull(),
-  senderEmail: text("sender_email"),
+  senderEmail: text("sender_email").notNull(),
 });
 
 // Schema for validating email input

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
 import FileAttachment from "@/components/file-attachment";
 import EmailNotification from "@/components/email-notification";
 import { validateEmailList, validateEmail } from "@/lib/utils";
