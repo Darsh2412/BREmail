@@ -16,7 +16,7 @@ export default function FileAttachment({
   setError 
 }: FileAttachmentProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
   
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -34,7 +34,7 @@ export default function FileAttachment({
     });
     
     setAttachments(newAttachments);
-    setError(fileSizeError ? 'One or more files exceed the maximum allowed size (10MB)' : '');
+    setError(fileSizeError ? 'One or more files exceed the maximum allowed size (25MB)' : '');
     
     // Clear the input so the same file can be selected again
     if (fileInputRef.current) {
@@ -90,7 +90,7 @@ export default function FileAttachment({
         <div>
           <h3 className="text-gray-700 font-medium">Attachments</h3>
           <p className="text-xs text-gray-500 mt-1">
-            Supports all file types including ZIP files (Max 10MB per file)
+            Supports all file types including ZIP files (Max 25MB per file)
           </p>
         </div>
         <div className="relative">

@@ -1,7 +1,7 @@
 import multer from "multer";
 
-// Maximum file size: 10MB
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// Maximum file size: 25MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
 // Store files in memory
 const storage = multer.memoryStorage();
