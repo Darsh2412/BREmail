@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { upload } from "./multer-config";
@@ -10,21 +10,23 @@ import { log } from "./vite";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Email sending endpoint
-  app.post("/api/send-email", upload.array("attachments"), async (req, res) => {
+  app.post("/api/send-email", upload.array("attachments"), async (req: Request, res) => {
     try {
       // Validate the request body
-      const { to, cc, bcc, subject, message } = req.body;
+      const { to, cc, bcc, subject, message, senderEmail, senderPassword } = req.body;
       
       const validatedData = emailSchema.parse({
         to,
         cc: cc || "",
         bcc: bcc || "",
         subject,
-        message
+        message,
+        senderEmail,
+        senderPassword
       });
       
       // Access files uploaded by multer
-      const files = req.files as Express.Multer.File[];
+      const files = (req.files || []) as Express.Multer.File[];
       
       // Send the email
       const result = await sendEmail({
@@ -33,7 +35,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bcc: validatedData.bcc,
         subject: validatedData.subject,
         message: validatedData.message,
-        attachments: files
+        attachments: files,
+        senderEmail: validatedData.senderEmail,
+        senderPassword: validatedData.senderPassword
       });
       
       // Store sent email in database
@@ -49,7 +53,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bcc: validatedData.bcc,
         subject: validatedData.subject,
         message: validatedData.message,
-        attachmentInfo
+        attachmentInfo,
+        senderEmail: validatedData.senderEmail
       });
       
       log(`Email sent to: ${validatedData.to}`);

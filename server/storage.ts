@@ -18,11 +18,20 @@ export class MemStorage implements IStorage {
   async createEmail(insertEmail: InsertEmail): Promise<Email> {
     const id = this.currentId++;
     const sentAt = new Date();
+    
+    // Handle nulls for optional fields
     const email: Email = { 
-      ...insertEmail, 
-      id, 
-      sentAt
+      id,
+      sentAt,
+      to: insertEmail.to,
+      cc: insertEmail.cc || null,
+      bcc: insertEmail.bcc || null,
+      subject: insertEmail.subject,
+      message: insertEmail.message,
+      attachmentInfo: insertEmail.attachmentInfo || null,
+      senderEmail: insertEmail.senderEmail || null
     };
+    
     this.emails.set(id, email);
     return email;
   }

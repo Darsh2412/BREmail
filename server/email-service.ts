@@ -8,10 +8,24 @@ interface SendEmailParams {
   subject: string;
   message: string;
   attachments: Express.Multer.File[];
+  senderEmail?: string;
+  senderPassword?: string;
 }
 
 // Configure transporter
-const createTransporter = () => {
+const createTransporter = (customEmail?: string, customPassword?: string) => {
+  // If custom credentials provided (Gmail), use them
+  if (customEmail && customPassword) {
+    log(`Using custom email credentials for: ${customEmail}`);
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: customEmail,
+        pass: customPassword // This should be an app password for Gmail
+      }
+    });
+  }
+  
   // Use environment variables for email configuration with fallbacks
   const host = process.env.SMTP_HOST || "smtp.example.com";
   const port = parseInt(process.env.SMTP_PORT || "587");
@@ -51,10 +65,12 @@ export async function sendEmail({
   bcc, 
   subject, 
   message, 
-  attachments 
+  attachments,
+  senderEmail,
+  senderPassword
 }: SendEmailParams) {
   try {
-    const transporter = createTransporter();
+    const transporter = createTransporter(senderEmail, senderPassword);
     
     // Format attachments for nodemailer
     const formattedAttachments = attachments.map(file => ({
@@ -64,9 +80,15 @@ export async function sendEmail({
       contentType: file.mimetype
     }));
     
+    // Determine from address
+    let fromAddress = process.env.EMAIL_FROM || '"Email Sender" <sender@example.com>';
+    if (senderEmail) {
+      fromAddress = senderEmail;
+    }
+    
     // Send email
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM || '"Email Sender" <sender@example.com>',
+      from: fromAddress,
       to,
       cc,
       bcc,
@@ -76,9 +98,11 @@ export async function sendEmail({
     });
     
     // For development, log the preview URL
-    if (process.env.NODE_ENV !== "production" && info.messageId) {
+    if (process.env.NODE_ENV !== "production" && info.messageId && !senderEmail) {
       log(`Message sent: ${info.messageId}`);
       log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+    } else {
+      log(`Email sent from ${fromAddress} to ${to}`);
     }
     
     return { messageId: info.messageId };

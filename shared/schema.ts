@@ -12,6 +12,7 @@ export const emails = pgTable("emails", {
   message: text("message").notNull(),
   attachmentInfo: jsonb("attachment_info"),
   sentAt: timestamp("sent_at").defaultNow().notNull(),
+  senderEmail: text("sender_email"),
 });
 
 // Schema for validating email input
@@ -21,6 +22,14 @@ export const emailSchema = z.object({
   bcc: z.string().optional(),
   subject: z.string().min(1, "Subject is required"),
   message: z.string().min(1, "Message is required"),
+  senderEmail: z.string().email("Valid sender email is required").optional(),
+  senderPassword: z.string().optional(),
+});
+
+// Schema for validating sender credentials
+export const senderCredentialsSchema = z.object({
+  email: z.string().email("Valid email is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export const insertEmailSchema = createInsertSchema(emails).omit({
@@ -30,3 +39,4 @@ export const insertEmailSchema = createInsertSchema(emails).omit({
 
 export type InsertEmail = z.infer<typeof insertEmailSchema>;
 export type Email = typeof emails.$inferSelect;
+export type SenderCredentials = z.infer<typeof senderCredentialsSchema>;

@@ -7,17 +7,35 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+interface CustomFetchConfig {
+  headers?: Record<string, string>;
+  body?: any;
+  [key: string]: any;
+}
+
+interface ApiRequestOptions {
+  customConfig?: CustomFetchConfig;
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
+  options?: ApiRequestOptions
 ): Promise<Response> {
-  const res = await fetch(url, {
+  const defaultConfig = {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
+    headers: data && !options?.customConfig ? { "Content-Type": "application/json" } : {},
+    body: data && !options?.customConfig?.body ? JSON.stringify(data) : undefined,
     credentials: "include",
-  });
+  };
+
+  // Merge with custom config if provided
+  const config = options?.customConfig 
+    ? { ...defaultConfig, ...options.customConfig, method } // Ensure method is not overridden
+    : defaultConfig;
+
+  const res = await fetch(url, config);
 
   await throwIfResNotOk(res);
   return res;

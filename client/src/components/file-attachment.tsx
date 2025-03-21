@@ -53,10 +53,46 @@ export default function FileAttachment({
     }
   };
   
+  // Function to get file icon based on file type
+  const getFileIcon = (fileName: string): string => {
+    const extension = fileName.split('.').pop()?.toLowerCase() || '';
+    
+    switch (extension) {
+      case 'pdf':
+        return 'ri-file-pdf-line';
+      case 'doc':
+      case 'docx':
+        return 'ri-file-word-line';
+      case 'xls':
+      case 'xlsx':
+        return 'ri-file-excel-line';
+      case 'ppt':
+      case 'pptx':
+        return 'ri-file-ppt-line';
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return 'ri-file-zip-line';
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'bmp':
+        return 'ri-image-line';
+      default:
+        return 'ri-file-text-line';
+    }
+  };
+  
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-gray-700 font-medium">Attachments</h3>
+        <div>
+          <h3 className="text-gray-700 font-medium">Attachments</h3>
+          <p className="text-xs text-gray-500 mt-1">
+            Supports all file types including ZIP files (Max 10MB per file)
+          </p>
+        </div>
         <div className="relative">
           <input 
             type="file" 
@@ -74,14 +110,15 @@ export default function FileAttachment({
       
       <div className="border border-dashed border-gray-300 rounded bg-gray-100 p-3 min-h-[100px]">
         {attachments.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <span>No files attached</span>
+          <div className="flex flex-col items-center justify-center h-[100px] text-gray-400">
+            <i className="ri-upload-cloud-line text-2xl mb-2"></i>
+            <span>Drag and drop files here, or click "Add Files"</span>
           </div>
         ) : (
           attachments.map((file, index) => (
             <div key={index} className="file-list-item flex items-center justify-between bg-white p-2 rounded shadow-sm mb-2">
               <div className="flex items-center">
-                <i className="ri-file-text-line text-primary mr-2"></i>
+                <i className={`${getFileIcon(file.name)} text-primary mr-2 text-lg`}></i>
                 <div>
                   <div className="text-sm font-medium text-gray-700">{file.name}</div>
                   <div className="text-xs text-gray-400">{formatFileSize(file.size)}</div>
