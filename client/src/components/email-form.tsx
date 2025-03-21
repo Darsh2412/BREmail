@@ -56,7 +56,6 @@ export default function EmailForm() {
     message: ''
   });
   
-  const [usesCustomSender, setUsesCustomSender] = useState<boolean>(false);
   const [activeRecipientType, setActiveRecipientType] = useState<'to' | 'cc' | 'bcc'>('to');
 
   const sendEmailMutation = useMutation({
@@ -125,15 +124,13 @@ export default function EmailForm() {
       newErrors.message = 'Please enter a message';
     }
     
-    // Validate custom sender if enabled
-    if (usesCustomSender) {
-      if (!validateEmail(formState.senderEmail)) {
-        newErrors.senderEmail = 'Please enter a valid email address';
-      }
-      
-      if (!formState.senderPassword) {
-        newErrors.senderPassword = 'Please enter your app password';
-      }
+    // Validate sender credentials (required)
+    if (!validateEmail(formState.senderEmail)) {
+      newErrors.senderEmail = 'Please enter a valid email address';
+    }
+    
+    if (!formState.senderPassword) {
+      newErrors.senderPassword = 'Please enter your app password';
     }
     
     setFormErrors(newErrors);
@@ -157,11 +154,9 @@ export default function EmailForm() {
     formData.append('subject', formState.subject);
     formData.append('message', formState.message);
     
-    // Add sender credentials if custom sender is enabled
-    if (usesCustomSender) {
-      formData.append('senderEmail', formState.senderEmail);
-      formData.append('senderPassword', formState.senderPassword);
-    }
+    // Add sender credentials (always required)
+    formData.append('senderEmail', formState.senderEmail);
+    formData.append('senderPassword', formState.senderPassword);
     
     // Append each file
     attachments.forEach(file => {
@@ -190,7 +185,6 @@ export default function EmailForm() {
       senderPassword: ''
     });
     setAttachments([]);
-    setUsesCustomSender(false);
   };
 
   return (
@@ -199,80 +193,56 @@ export default function EmailForm() {
         <h2 className="text-xl font-semibold text-gray-700 mb-6">Compose Email</h2>
         
         <form onSubmit={handleSubmit}>
-          {/* Sender Options */}
-          <Accordion type="single" collapsible className="mb-6">
-            <AccordionItem value="sender-options">
-              <AccordionTrigger className="text-gray-700 hover:text-primary">
-                <div className="flex items-center">
-                  <i className="ri-settings-3-line mr-2"></i>
-                  Sender Settings (Optional)
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="pt-4 pb-2">
-                  <div className="mb-4">
-                    <div className="flex items-center mb-4">
-                      <input
-                        type="checkbox"
-                        id="useCustomSender"
-                        checked={usesCustomSender}
-                        onChange={() => setUsesCustomSender(!usesCustomSender)}
-                        className="mr-2 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                      />
-                      <label htmlFor="useCustomSender" className="text-sm font-medium text-gray-700">
-                        Use my own Gmail account to send this email
-                      </label>
-                    </div>
-                    
-                    {usesCustomSender && (
-                      <div className="pl-6 border-l-2 border-gray-200">
-                        <p className="text-sm text-gray-500 mb-4">
-                          For Gmail, you need to use an "App Password". 
-                          <a href="https://support.google.com/accounts/answer/185833" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">
-                            Learn how to create one
-                          </a>
-                        </p>
-                        
-                        {/* Gmail Email */}
-                        <div className="mb-4">
-                          <Label htmlFor="senderEmail" className="block text-gray-700 font-medium mb-1">
-                            Gmail Address:
-                          </Label>
-                          <Input
-                            type="email"
-                            id="senderEmail"
-                            name="senderEmail"
-                            value={formState.senderEmail}
-                            onChange={handleInputChange}
-                            className={formErrors.senderEmail ? "border-red-500" : ""}
-                            placeholder="your.email@gmail.com"
-                          />
-                          {formErrors.senderEmail && <p className="text-red-500 text-sm mt-1">{formErrors.senderEmail}</p>}
-                        </div>
-                        
-                        {/* App Password */}
-                        <div className="mb-2">
-                          <Label htmlFor="senderPassword" className="block text-gray-700 font-medium mb-1">
-                            App Password:
-                          </Label>
-                          <Input
-                            type="password"
-                            id="senderPassword"
-                            name="senderPassword"
-                            value={formState.senderPassword}
-                            onChange={handleInputChange}
-                            className={formErrors.senderPassword ? "border-red-500" : ""}
-                            placeholder="16-character app password"
-                          />
-                          {formErrors.senderPassword && <p className="text-red-500 text-sm mt-1">{formErrors.senderPassword}</p>}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          {/* Sender Credentials - Required */}
+          <div className="mb-6 bg-gray-50 p-4 rounded-md border border-gray-200">
+            <h3 className="text-gray-700 font-medium mb-3 flex items-center">
+              <i className="ri-mail-settings-line mr-2"></i>
+              Sender Credentials (Required)
+            </h3>
+            
+            <p className="text-sm text-gray-500 mb-4">
+              Gmail authentication is required to send emails. You need to use an "App Password".
+              <a href="https://support.google.com/accounts/answer/185833" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">
+                Learn how to create one
+              </a>
+            </p>
+            
+            {/* Gmail Email */}
+            <div className="mb-4">
+              <Label htmlFor="senderEmail" className="block text-gray-700 font-medium mb-1">
+                Gmail Address:
+              </Label>
+              <Input
+                type="email"
+                id="senderEmail"
+                name="senderEmail"
+                value={formState.senderEmail}
+                onChange={handleInputChange}
+                className={formErrors.senderEmail ? "border-red-500" : ""}
+                placeholder="your.email@gmail.com"
+                required
+              />
+              {formErrors.senderEmail && <p className="text-red-500 text-sm mt-1">{formErrors.senderEmail}</p>}
+            </div>
+            
+            {/* App Password */}
+            <div className="mb-2">
+              <Label htmlFor="senderPassword" className="block text-gray-700 font-medium mb-1">
+                App Password:
+              </Label>
+              <Input
+                type="password"
+                id="senderPassword"
+                name="senderPassword"
+                value={formState.senderPassword}
+                onChange={handleInputChange}
+                className={formErrors.senderPassword ? "border-red-500" : ""}
+                placeholder="16-character app password"
+                required
+              />
+              {formErrors.senderPassword && <p className="text-red-500 text-sm mt-1">{formErrors.senderPassword}</p>}
+            </div>
+          </div>
           
           {/* Recipients Field Group with Dropdown */}
           <div className="mb-4">

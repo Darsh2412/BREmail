@@ -22,8 +22,8 @@ export const emailSchema = z.object({
   bcc: z.string().optional(),
   subject: z.string().min(1, "Subject is required"),
   message: z.string().min(1, "Message is required"),
-  senderEmail: z.string().email("Valid sender email is required").optional(),
-  senderPassword: z.string().optional(),
+  senderEmail: z.string().email("Valid sender email is required"),
+  senderPassword: z.string().min(1, "Sender password is required"),
 });
 
 // Schema for validating sender credentials

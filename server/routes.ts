@@ -15,6 +15,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate the request body
       const { to, cc, bcc, subject, message, senderEmail, senderPassword } = req.body;
       
+      // Check if sender credentials are provided
+      if (!senderEmail || !senderPassword) {
+        return res.status(400).json({ 
+          message: "Sender email and password are required"
+        });
+      }
+      
       const validatedData = emailSchema.parse({
         to,
         cc: cc || "",

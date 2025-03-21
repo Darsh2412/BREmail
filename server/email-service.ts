@@ -8,8 +8,8 @@ interface SendEmailParams {
   subject: string;
   message: string;
   attachments: Express.Multer.File[];
-  senderEmail?: string;
-  senderPassword?: string;
+  senderEmail: string;
+  senderPassword: string;
 }
 
 // Configure transporter
