@@ -19,6 +19,11 @@ export class MemStorage implements IStorage {
     const id = this.currentId++;
     const sentAt = new Date();
     
+    // Ensure senderEmail is always provided (now required)
+    if (!insertEmail.senderEmail) {
+      throw new Error("Sender email is required");
+    }
+    
     // Handle nulls for optional fields
     const email: Email = { 
       id,
@@ -29,7 +34,7 @@ export class MemStorage implements IStorage {
       subject: insertEmail.subject,
       message: insertEmail.message,
       attachmentInfo: insertEmail.attachmentInfo || null,
-      senderEmail: insertEmail.senderEmail || null
+      senderEmail: insertEmail.senderEmail // This is now required
     };
     
     this.emails.set(id, email);

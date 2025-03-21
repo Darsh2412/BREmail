@@ -6,6 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import FileAttachment from "@/components/file-attachment";
 import EmailNotification from "@/components/email-notification";
@@ -193,56 +199,58 @@ export default function EmailForm() {
         <h2 className="text-xl font-semibold text-gray-700 mb-6">Compose Email</h2>
         
         <form onSubmit={handleSubmit}>
-          {/* Sender Credentials - Required */}
-          <div className="mb-6 bg-gray-50 p-4 rounded-md border border-gray-200">
-            <h3 className="text-gray-700 font-medium mb-3 flex items-center">
-              <i className="ri-mail-settings-line mr-2"></i>
-              Sender Credentials (Required)
-            </h3>
-            
-            <p className="text-sm text-gray-500 mb-4">
-              Gmail authentication is required to send emails. You need to use an "App Password".
-              <a href="https://support.google.com/accounts/answer/185833" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">
-                Learn how to create one
-              </a>
-            </p>
-            
-            {/* Gmail Email */}
-            <div className="mb-4">
-              <Label htmlFor="senderEmail" className="block text-gray-700 font-medium mb-1">
-                Gmail Address:
-              </Label>
-              <Input
-                type="email"
-                id="senderEmail"
-                name="senderEmail"
-                value={formState.senderEmail}
-                onChange={handleInputChange}
-                className={formErrors.senderEmail ? "border-red-500" : ""}
-                placeholder="your.email@gmail.com"
-                required
-              />
-              {formErrors.senderEmail && <p className="text-red-500 text-sm mt-1">{formErrors.senderEmail}</p>}
-            </div>
-            
-            {/* App Password */}
-            <div className="mb-2">
-              <Label htmlFor="senderPassword" className="block text-gray-700 font-medium mb-1">
-                App Password:
-              </Label>
-              <Input
-                type="password"
-                id="senderPassword"
-                name="senderPassword"
-                value={formState.senderPassword}
-                onChange={handleInputChange}
-                className={formErrors.senderPassword ? "border-red-500" : ""}
-                placeholder="16-character app password"
-                required
-              />
-              {formErrors.senderPassword && <p className="text-red-500 text-sm mt-1">{formErrors.senderPassword}</p>}
-            </div>
-          </div>
+          {/* Sender Credentials - Required as Accordion */}
+          <Accordion type="single" collapsible className="mb-6 border rounded-md">
+            <AccordionItem value="sender-credentials" className="border-none">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-gray-50">
+                <div className="flex items-center">
+                  <i className="ri-mail-settings-line mr-2"></i>
+                  <span className="font-medium">Sender Credentials (Required)</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 py-3 bg-gray-50">
+                <p className="text-sm text-gray-500 mb-4">
+                  Gmail authentication is required to send emails. You need an App Password.
+                </p>
+                
+                {/* Gmail Email */}
+                <div className="mb-4">
+                  <Label htmlFor="senderEmail" className="block text-gray-700 font-medium mb-1">
+                    Gmail Address:
+                  </Label>
+                  <Input
+                    type="email"
+                    id="senderEmail"
+                    name="senderEmail"
+                    value={formState.senderEmail}
+                    onChange={handleInputChange}
+                    className={formErrors.senderEmail ? "border-red-500" : ""}
+                    placeholder="your.email@gmail.com"
+                    required
+                  />
+                  {formErrors.senderEmail && <p className="text-red-500 text-sm mt-1">{formErrors.senderEmail}</p>}
+                </div>
+                
+                {/* App Password */}
+                <div className="mb-2">
+                  <Label htmlFor="senderPassword" className="block text-gray-700 font-medium mb-1">
+                    App Password:
+                  </Label>
+                  <Input
+                    type="password"
+                    id="senderPassword"
+                    name="senderPassword"
+                    value={formState.senderPassword}
+                    onChange={handleInputChange}
+                    className={formErrors.senderPassword ? "border-red-500" : ""}
+                    placeholder="16-character app password"
+                    required
+                  />
+                  {formErrors.senderPassword && <p className="text-red-500 text-sm mt-1">{formErrors.senderPassword}</p>}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
           
           {/* Recipients Field Group with Dropdown */}
           <div className="mb-4">
