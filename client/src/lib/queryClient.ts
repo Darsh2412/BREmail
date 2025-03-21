@@ -23,7 +23,7 @@ export async function apiRequest(
   data?: unknown | undefined,
   options?: ApiRequestOptions
 ): Promise<Response> {
-  const defaultConfig = {
+  const defaultConfig: RequestInit = {
     method,
     headers: data && !options?.customConfig ? { "Content-Type": "application/json" } : {},
     body: data && !options?.customConfig?.body ? JSON.stringify(data) : undefined,
@@ -31,9 +31,16 @@ export async function apiRequest(
   };
 
   // Merge with custom config if provided
-  const config = options?.customConfig 
-    ? { ...defaultConfig, ...options.customConfig, method } // Ensure method is not overridden
-    : defaultConfig;
+  let config: RequestInit;
+  if (options?.customConfig) {
+    config = {
+      ...defaultConfig,
+      ...options.customConfig,
+      method, // Ensure method is not overridden
+    };
+  } else {
+    config = defaultConfig;
+  }
 
   const res = await fetch(url, config);
 

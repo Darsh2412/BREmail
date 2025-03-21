@@ -57,6 +57,7 @@ export default function EmailForm() {
   });
   
   const [usesCustomSender, setUsesCustomSender] = useState<boolean>(false);
+  const [activeRecipientType, setActiveRecipientType] = useState<'to' | 'cc' | 'bcc'>('to');
 
   const sendEmailMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -273,58 +274,110 @@ export default function EmailForm() {
             </AccordionItem>
           </Accordion>
           
-          {/* Recipients Field Group */}
+          {/* Recipients Field Group with Dropdown */}
           <div className="mb-4">
-            <div className="flex flex-col md:flex-row md:items-center mb-2">
-              <Label htmlFor="to" className="block text-gray-700 font-medium w-20 mb-1 md:mb-0">To:</Label>
-              <div className="flex-1">
-                <Input 
-                  type="text" 
-                  id="to" 
-                  name="to"
-                  value={formState.to}
-                  onChange={handleInputChange}
-                  className={formErrors.to ? "border-red-500" : ""}
-                  placeholder="recipient@example.com, another@example.com" 
-                />
+            <div className="flex flex-col mb-4">
+              <div className="flex flex-col md:flex-row md:items-start mb-2">
+                <div className="w-20 mb-1 md:mb-0 flex items-center">
+                  <select
+                    className="text-gray-700 font-medium bg-transparent border-none outline-none cursor-pointer p-0 pr-1"
+                    value={activeRecipientType}
+                    onChange={(e) => {
+                      setActiveRecipientType(e.target.value as 'to' | 'cc' | 'bcc');
+                    }}
+                  >
+                    <option value="to">To:</option>
+                    <option value="cc">Cc:</option>
+                    <option value="bcc">Bcc:</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  {activeRecipientType === 'to' && (
+                    <>
+                      <Input 
+                        type="text" 
+                        id="to" 
+                        name="to"
+                        value={formState.to}
+                        onChange={handleInputChange}
+                        className={formErrors.to ? "border-red-500" : ""}
+                        placeholder="recipient@example.com, another@example.com" 
+                      />
+                      {formErrors.to && <p className="text-red-500 text-sm mt-1">{formErrors.to}</p>}
+                    </>
+                  )}
+                  
+                  {activeRecipientType === 'cc' && (
+                    <Input 
+                      type="text" 
+                      id="cc" 
+                      name="cc"
+                      value={formState.cc}
+                      onChange={handleInputChange}
+                      placeholder="cc@example.com" 
+                    />
+                  )}
+                  
+                  {activeRecipientType === 'bcc' && (
+                    <Input 
+                      type="text" 
+                      id="bcc" 
+                      name="bcc"
+                      value={formState.bcc}
+                      onChange={handleInputChange}
+                      placeholder="bcc@example.com" 
+                    />
+                  )}
+                </div>
               </div>
             </div>
-            <div className="ml-0 md:ml-20">
-              {formErrors.to && <p className="text-red-500 text-sm">{formErrors.to}</p>}
-            </div>
-          </div>
-
-          {/* CC Field */}
-          <div className="mb-4">
-            <div className="flex flex-col md:flex-row md:items-center">
-              <Label htmlFor="cc" className="block text-gray-700 font-medium w-20 mb-1 md:mb-0">Cc:</Label>
-              <div className="flex-1">
-                <Input 
-                  type="text" 
-                  id="cc" 
-                  name="cc"
-                  value={formState.cc}
-                  onChange={handleInputChange}
-                  placeholder="cc@example.com" 
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* BCC Field */}
-          <div className="mb-4">
-            <div className="flex flex-col md:flex-row md:items-center">
-              <Label htmlFor="bcc" className="block text-gray-700 font-medium w-20 mb-1 md:mb-0">Bcc:</Label>
-              <div className="flex-1">
-                <Input 
-                  type="text" 
-                  id="bcc" 
-                  name="bcc"
-                  value={formState.bcc}
-                  onChange={handleInputChange}
-                  placeholder="bcc@example.com" 
-                />
-              </div>
+            
+            {/* Recipient Pills/Tags */}
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formState.to && (
+                <div className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center text-gray-700">
+                  <span className="font-medium mr-1">To:</span>
+                  <span>{formState.to}</span>
+                  <button 
+                    type="button" 
+                    className="ml-1 text-gray-500 hover:text-gray-700" 
+                    onClick={() => setActiveRecipientType('to')}
+                    title="Edit To field"
+                  >
+                    <i className="ri-edit-line text-xs"></i>
+                  </button>
+                </div>
+              )}
+              
+              {formState.cc && (
+                <div className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center text-gray-700">
+                  <span className="font-medium mr-1">Cc:</span>
+                  <span>{formState.cc}</span>
+                  <button 
+                    type="button" 
+                    className="ml-1 text-gray-500 hover:text-gray-700" 
+                    onClick={() => setActiveRecipientType('cc')}
+                    title="Edit Cc field"
+                  >
+                    <i className="ri-edit-line text-xs"></i>
+                  </button>
+                </div>
+              )}
+              
+              {formState.bcc && (
+                <div className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center text-gray-700">
+                  <span className="font-medium mr-1">Bcc:</span>
+                  <span>{formState.bcc}</span>
+                  <button 
+                    type="button" 
+                    className="ml-1 text-gray-500 hover:text-gray-700" 
+                    onClick={() => setActiveRecipientType('bcc')}
+                    title="Edit Bcc field"
+                  >
+                    <i className="ri-edit-line text-xs"></i>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
